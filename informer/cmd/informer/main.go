@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
 	"os"
 )
 
@@ -30,7 +30,7 @@ func main() {
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			mObj := obj.(v1.Object)
-			log.Printf("New Pod Added to Store: %s", mObj.GetName())
+			fmt.Printf("New Pod Added to Store: %s \n", mObj.GetName())
 		},
 	})
 
