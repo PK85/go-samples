@@ -32,7 +32,7 @@ func main() {
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			mObj := obj.(v1.Object)
-			fmt.Printf("New Pod Added to Store: %s \n", mObj.GetName())
+			fmt.Printf("New Pod Added to Store:[Namespace: %s] %s \n", mObj.GetNamespace(), mObj.GetName())
 		},
 	})
 
