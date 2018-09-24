@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -13,7 +13,7 @@ import (
 
 func main() {
 	kubeconfig := os.Getenv("KUBECONFIG")
-	fmt.Println("KUBECONFIG points to:" + kubeconfig)
+	log.Printf("KUBECONFIG points to: %s \n", kubeconfig)
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		panic(err.Error())
@@ -32,7 +32,7 @@ func main() {
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			mObj := obj.(v1.Object)
-			fmt.Printf("New Pod Added to Store:[Namespace: %s] %s \n", mObj.GetNamespace(), mObj.GetName())
+			log.Printf("New Pod Added to Store:[Namespace: %s] %s \n", mObj.GetNamespace(), mObj.GetName())
 		},
 	})
 
