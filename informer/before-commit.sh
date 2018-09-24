@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly CI_FLAG=ci
+readonly BUILD_PUBLISH_DOCKER=publish
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -24,16 +24,8 @@ if [ ${ensureResult} != 0 ]; then
 else echo -e "${GREEN}√ dep ensure -v --vendor-only${NC}"
 fi
 
-##
-# GO BUILD
-##
-buildEnv=""
-if [ "$1" == "$CI_FLAG" ]; then
-	# build binary statically
-	buildEnv="env CGO_ENABLED=0"
-fi
-
-${buildEnv} go build -o informer ./cmd/informer
+# build binary statically and for linux
+env CGO_ENABLED=0 GOOS=linux go build -o ./deploy/informer ./cmd/informer
 
 goBuildResult=$?
 if [ ${goBuildResult} != 0 ]; then
@@ -118,3 +110,11 @@ for vPackage in "${packagesToVet[@]}"; do
 	else echo -e "${GREEN}√ go vet ${vPackage} ${NC}"
 	fi
 done
+
+##
+# BUILD AND PUBLISH AN IMAGE
+##
+if [ "$1" == "$BUILD_PUBLISH_DOCKER" ]; then
+    cd deploy
+    ./publish-image.sh
+fi
