@@ -2,7 +2,10 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
@@ -36,5 +39,11 @@ func main() {
 		},
 	})
 
+	go func() {
+		log.Println("Metrics ON!")
+		http.Handle("/metrics", promhttp.Handler())
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
 	informer.Run(stopper)
+
 }

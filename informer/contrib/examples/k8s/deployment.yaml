@@ -10,6 +10,7 @@ spec:
     metadata:
       labels:
         example: informer
+        k8s-app: metrics
       annotations:
         sidecar.istio.io/inject: "true"
     spec:
@@ -19,8 +20,21 @@ spec:
         imagePullPolicy: Always
         name: informer
         ports:
-        - name: http
-          containerPort: 8017
+        - name: metrics-port
+          containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: informer-metrics
+  labels:
+    k8s-app: metrics
+spec:
+  selector:
+    app: informer
+  ports:
+  - name: metrics-port
+    port: 8080
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -54,6 +68,26 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: informer-cluster-role
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: informer-metrics
+  labels:
+    prometheus: core
+    app: "informer"
+spec:
+  selector:
+    matchLabels:
+      k8s-app: metrics
+  targetLabels:
+  - k8s-app
+  endpoints:
+  - port: metrics-port
+    interval: 30s
+  namespaceSelector:
+    matchNames:
+    - default
 
 
 
